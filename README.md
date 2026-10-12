@@ -2,15 +2,6 @@
 
 A role-based school website in Go. One binary, one SQLite file, no JavaScript frameworks.
 
-## Run it
-
-```bash
-cp .env.example .env            # then fill in SCHOOL_DATA_KEY (openssl rand -base64 32)
-go mod tidy                     # fetches the SQLite driver and writes go.sum
-set -a; source .env; set +a
-SCHOOL_SECURE_COOKIES=false go run ./cmd/server     # false only for local http
-```
-
 On first start the server prints a **one-time setup link** for the principal in its log. Open it and choose a
 password. Then:
 
@@ -19,8 +10,6 @@ password. Then:
 3. Give the link to the person (in person, printed slip, or a message). They choose their own password.
    Nobody else ever sees or knows it. Links work once and expire after 72 hours.
 
-The default driver (`mattn/go-sqlite3`) needs a C compiler. To avoid that, swap in `modernc.org/sqlite`
-in `internal/database/driver.go` (instructions in the file).
 
 ## Layout
 
@@ -70,15 +59,11 @@ web/static/fonts/      Newsreader and IBM Plex Sans, self-hosted (SIL OFL licenc
 ### Photographs
 
 The sign-in page and the student, teacher and support headers use three placeholder photographs from Unsplash
-(free under the Unsplash License). Replace them any time, either by setting `SCHOOL_IMG_LOGIN`,
-`SCHOOL_IMG_STUDENT`, `SCHOOL_IMG_STAFF` to your own https URLs, or by saving files in `web/static/img/`
-and pointing the variables at `/static/img/yourfile.jpg`. If an image cannot load, the page falls back to plain navy.
+(free under the Unsplash License). If an image cannot load, the page falls back to plain navy.
 
 Placeholders: Doug Linstedt (classroom, Lagos), Jaykumar Bherwani (students studying), Wojciech Pacześ (library).
 
 ## Security measures
-
-- Passwords: PBKDF2-HMAC-SHA256, 600,000 iterations, per-user salt. 10+ characters with a letter and a number.
 - **No temporary passwords.** New accounts hold an unusable password until the owner sets one from a single-use,
   72-hour setup link (only its SHA-256 is stored). A reset works the same way and signs the person out everywhere.
 - Sessions: random 256-bit token in an HttpOnly, SameSite=Lax cookie (`__Host-` prefixed and Secure in production),
@@ -94,32 +79,3 @@ Placeholders: Doug Linstedt (classroom, Lagos), Jaykumar Bherwani (students stud
   the configured image hosts, no framing. Also `no-store` caching, HSTS, request size and timeout limits.
 - CSV downloads neutralise spreadsheet formulas. Templates auto-escape output; every SQL query is parameterised.
 - Audit log of sign-ins, registrations, setup links, score submissions, exports and bank views.
-
-## Deploying
-
-Run behind HTTPS (Caddy or Nginx). Pass the original `Host` header through, set `SCHOOL_BASE_URL`, and set
-`X-Real-IP` plus `SCHOOL_TRUST_PROXY=true` only if the proxy is yours. Back up `data/` and keep `SCHOOL_DATA_KEY`
-safe: without it, saved bank account numbers cannot be read.
-
-## Troubleshooting
-
-**Locked out, or a setup link was lost or used up.** On the server, run
-`go run ./cmd/server -setup-link principal` (use any username). It prints a fresh 72-hour link and puts that
-account back into "awaiting setup", so the old password stops working. Open the link and choose a new password.
-No data is lost. You need `.env` loaded first (`set -a; source .env; set +a`).
-
-**Sign-in says "The sign-in page expired".** The server log prints `sign-in form rejected` with the reason.
-Usually a browser blocked cookies or a stale tab was used; trying again works. If it repeats, check
-`SCHOOL_BASE_URL` matches the address in your browser.
-
-**403 "You do not have access to this page" after submitting a form (setup link, sign-in, anything).**
-The site rejects form posts whose browser `Origin` does not match the server. This happens behind a proxy,
-tunnel or port-forward that rewrites the `Host` header. Fix: set `SCHOOL_BASE_URL` to the exact address people
-type in the browser (for example `https://portal.yourschool.ng`) and restart. The server log also prints a line
-starting `request blocked: Origin does not match this site` showing the two values it compared.
-With Nginx also add `proxy_set_header Host $host;`.
-
-## Tests
-
-`go test ./...` covers password hashing, encryption, grading, statistics and report rules.
-# school-website
