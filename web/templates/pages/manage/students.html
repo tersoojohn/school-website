@@ -1,0 +1,37 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner">
+  <div><h1>Students</h1><p class="sub">{{plural (len .Data.Students) "student" "students"}}{{if .Data.ClassID}} in this class{{else}} across the school{{end}}</p></div>
+  <div class="pagehead-actions"><a class="btn btn-primary" href="/manage/students/new">Register a student</a></div>
+</div></div>
+<div class="container page">
+  <div class="toolbar">
+    <form method="get" action="/manage/students" class="inline-form flush">
+      <label class="field"><span>Class</span>
+        <select name="class">
+          <option value="0">All classes</option>
+          {{range .Data.Classes}}<option value="{{.ID}}"{{if eq .ID $.Data.ClassID}} selected{{end}}>{{.Name}}</option>{{end}}
+        </select>
+      </label>
+      <button class="btn">Show</button>
+    </form>
+    <div class="search"><label class="sr-only" for="q">Search students</label><input id="q" type="search" placeholder="Search by name or ID" data-filter="#students" autocomplete="off"></div>
+    <p class="count" data-filter-count></p>
+  </div>
+  {{if .Data.Students}}
+  <div class="table-wrap"><table class="table" id="students">
+    <thead><tr><th data-sort="text">Name</th><th data-sort="text">Student ID</th><th data-sort="text">Class</th><th>Guardian</th><th data-sort="text">Status</th></tr></thead>
+    <tbody>
+      {{range .Data.Students}}
+      <tr data-row>
+        <td><a href="/manage/people/{{.ID}}">{{.FullName}}</a></td>
+        <td>{{.Username}}</td>
+        <td>{{.ClassName}}</td>
+        <td>{{.GuardianName}}{{if .GuardianPhone}}<span class="sub">{{.GuardianPhone}}</span>{{end}}</td>
+        <td>{{if not .Active}}<span class="chip chip-bad">Deactivated</span>{{else if .MustChangePassword}}<span class="chip chip-warn">Awaiting setup</span>{{else}}<span class="chip chip-ok">Active</span>{{end}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table></div>
+  {{else}}<p class="empty">No students found.</p>{{end}}
+</div>
+{{end}}

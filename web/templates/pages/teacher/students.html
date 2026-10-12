@@ -1,0 +1,33 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner">
+  <div>
+    <h1>All my students</h1>
+    <p class="sub">{{plural .Data.Total "student" "students"}} across {{plural (len .Data.ByClass) "class" "classes"}} and {{plural .Data.Subjects "subject" "subjects"}}.</p>
+  </div>
+  <div class="pagehead-actions">
+    <a class="btn" href="/teacher/students/export.csv">Download as spreadsheet</a>
+  </div>
+</div></div>
+<div class="container page">
+  {{if .Data.Students}}
+  <ul class="tags" aria-label="Students per class">
+    {{range .Data.ByClass}}<li><strong>{{.Class}}</strong> {{.Count}}</li>{{end}}
+  </ul>
+  <div class="toolbar">
+    <div class="search"><label class="sr-only" for="q">Search your students</label><input id="q" type="search" placeholder="Search by name, ID, class or subject" data-filter="#roster" autocomplete="off"></div>
+    <p class="count" data-filter-count></p>
+  </div>
+  <div class="table-wrap"><table class="table" id="roster">
+    <thead><tr><th data-sort="text">Name</th><th data-sort="text">Student ID</th><th data-sort="text">Class</th><th>Subjects you teach them</th></tr></thead>
+    <tbody>
+      {{range .Data.Students}}
+      <tr data-row><td>{{.FullName}}</td><td>{{.Username}}</td><td>{{.Class}}</td><td>{{.Subjects}}</td></tr>
+      {{end}}
+    </tbody>
+  </table></div>
+  <p class="hint spaced">To change scores for a whole class at once, open that class from <a href="/teacher">My classes</a>.</p>
+  {{else}}
+  <p class="empty">You have no students yet. Once the school office assigns you a subject in a class, every student in that class appears here.</p>
+  {{end}}
+</div>
+{{end}}

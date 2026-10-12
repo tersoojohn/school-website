@@ -1,0 +1,34 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner">
+  <div><h1>Staff</h1><p class="sub">{{plural (len .Data.Staff) "staff member" "staff members"}}</p></div>
+  <div class="pagehead-actions"><a class="btn btn-primary" href="/manage/staff/new">Register a staff member</a></div>
+</div></div>
+<div class="container page">
+  <p class="filters">
+    <span class="muted">Show</span>
+    <a href="/manage/staff"{{if eq .Data.Kind ""}} aria-current="true"{{end}}>All</a>
+    <a href="/manage/staff?kind=educating"{{if eq .Data.Kind "educating"}} aria-current="true"{{end}}>Educating</a>
+    <a href="/manage/staff?kind=non_educating"{{if eq .Data.Kind "non_educating"}} aria-current="true"{{end}}>Non-educating</a>
+  </p>
+  {{if .Data.Staff}}
+  <div class="toolbar">
+    <div class="search"><label class="sr-only" for="q">Search staff</label><input id="q" type="search" placeholder="Search by name or ID" data-filter="#staff" data-count="#staff-count" autocomplete="off"></div>
+    <p class="count" id="staff-count"></p>
+  </div>
+  <div class="table-wrap"><table class="table" id="staff">
+    <thead><tr><th data-sort="text">Name</th><th data-sort="text">Staff ID</th><th data-sort="text">Type</th><th data-sort="text">Job title</th><th>Status</th></tr></thead>
+    <tbody>
+      {{range .Data.Staff}}
+      <tr data-row>
+        <td><a href="/manage/people/{{.ID}}">{{.FullName}}</a></td>
+        <td>{{.Username}}</td>
+        <td>{{if eq .Kind "educating"}}Educating{{else}}Non-educating{{end}}</td>
+        <td>{{.JobTitle}}</td>
+        <td>{{if not .Active}}<span class="chip chip-bad">Deactivated</span>{{else if .MustChangePassword}}<span class="chip chip-warn">Awaiting setup</span>{{else}}<span class="chip chip-ok">Active</span>{{end}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table></div>
+  {{else}}<p class="empty">No staff found.</p>{{end}}
+</div>
+{{end}}

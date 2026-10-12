@@ -1,0 +1,27 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner">
+  <div><h1>Announcements</h1><p class="sub">{{plural (len .Data.Items) "announcement" "announcements"}} for you.</p></div>
+  {{if .Data.CanPost}}<div class="pagehead-actions"><a class="btn btn-primary" href="/announcements/new">Write an announcement</a></div>{{end}}
+</div></div>
+<div class="container page">
+{{if .Data.Items}}
+<ul class="notices">
+  {{range .Data.Items}}
+  <li class="notice">
+    <h3>{{.Title}}</h3>
+    <p class="notice-meta"><span>{{.AuthorName}}, {{.AuthorRole.Label}}</span><span class="chip chip-outline">{{.Audience}}</span><span>{{datetime .CreatedAt}}</span></p>
+    {{range paragraphs .Body}}<p>{{.}}</p>{{end}}
+    {{if and .CanDelete $.Data.CanPost}}
+    <form method="post" action="/announcements/{{.ID}}/delete" data-confirm="Delete this announcement for everyone?">
+      <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+      <button class="btn btn-sm btn-danger">Delete</button>
+    </form>
+    {{end}}
+  </li>
+  {{end}}
+</ul>
+{{else}}
+<p class="empty">Nothing has been announced to you yet.</p>
+{{end}}
+</div>
+{{end}}

@@ -1,0 +1,59 @@
+{{define "base"}}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#0a1530">
+<title>{{.Title}} - {{.SchoolName}}</title>
+<link rel="preload" href="/static/fonts/newsreader-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/layout.css">
+<link rel="stylesheet" href="/static/css/components.css">
+<link rel="stylesheet" href="/static/css/auth.css">
+<link rel="stylesheet" href="/static/css/student.css">
+<script src="/static/js/boot.js"></script>
+<script src="/static/js/app.js" defer></script>
+<script src="/static/js/charts.js" defer></script>
+{{block "scripts" .}}{{end}}
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+{{if .User}}
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/">{{.SchoolName}}</a>
+    <nav class="mainnav" aria-label="Main">
+      <ul>
+        {{range .Nav}}<li><a href="{{.Path}}"{{if .Active}} aria-current="page"{{end}}>{{.Label}}</a></li>
+        {{end}}
+      </ul>
+    </nav>
+    <details class="account">
+      <summary><span class="account-name">{{.User.FullName}}</span></summary>
+      <div class="account-menu">
+        <p class="account-role">{{.User.Role.Label}}, {{.User.Username}}</p>
+        <a href="/account/password">Change password</a>
+        <form method="post" action="/logout">
+          <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+          <button class="menu-btn">Sign out</button>
+        </form>
+      </div>
+    </details>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+  {{with .Flash}}<div class="container flash-wrap"><p class="flash flash-{{.Kind}}" role="status">{{.Message}}</p></div>{{end}}
+  {{template "content" .}}
+</main>
+<footer class="foot"><div class="container"><p>{{.SchoolName}}. Sign-in sessions end after 30 minutes without activity.</p></div></footer>
+{{else}}
+<main id="main" tabindex="-1">
+  {{template "content" .}}
+</main>
+{{end}}
+</body>
+</html>
+{{end}}

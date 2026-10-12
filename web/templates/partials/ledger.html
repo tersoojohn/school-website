@@ -1,0 +1,29 @@
+{{define "subject_ledger"}}
+{{if .}}
+<div class="legend"><span class="l-bar">Your total</span>{{range $i, $r := .}}{{if and $r.HasAvg (eq $i 0)}}<span class="l-avg">Class average</span>{{end}}{{end}}<span>Select a subject for the breakdown</span></div>
+<ol class="subjects" data-enter>
+  {{range $i, $r := .}}
+  <li class="subject" data-i="{{$i}}">
+    <button type="button" class="subject-row" aria-expanded="false" aria-controls="sub-{{$i}}"{{if eq $i 0}} data-open-first{{end}}>
+      <span class="subject-name">{{$r.Subject}}</span>
+      <span class="subject-bar-wrap"><span class="bar"><span class="bar-fill" data-w="{{num $r.Total}}"></span>{{if $r.HasAvg}}<span class="bar-avg" data-a="{{num $r.ClassAvg}}"></span><span class="bar-avg-label" data-a="{{num $r.ClassAvg}}">Class average {{f1 $r.ClassAvg}}</span>{{end}}</span></span>
+      <span class="subject-total">{{f1 $r.Total}}</span>
+      <span class="stamp" data-g="{{$r.Grade}}" aria-label="Grade {{$r.Grade}}">{{$r.Grade}}</span>
+      <span class="subject-chev" aria-hidden="true"></span>
+    </button>
+    <div class="subject-more" id="sub-{{$i}}" role="region" aria-label="{{$r.Subject}} breakdown">
+      <div class="subject-more-inner">
+        <div class="breakdown">
+          <div><h4>Continuous assessment</h4><p class="val">{{f1 $r.CA}} <small>out of 40</small></p><div class="mini"><span data-w="{{ratio $r.CA 40}}"></span></div></div>
+          <div><h4>Exam</h4><p class="val">{{f1 $r.Exam}} <small>out of 60</small></p><div class="mini"><span data-w="{{ratio $r.Exam 60}}"></span></div></div>
+          <div><h4>Result</h4><p class="val">{{$r.Remark}}</p>{{if $r.HasAvg}}<p class="remark muted">{{vsavg $r.Total $r.ClassAvg}}</p>{{end}}</div>
+        </div>
+      </div>
+    </div>
+  </li>
+  {{end}}
+</ol>
+{{else}}
+<p class="empty">No results have been published for this term yet. They appear here as soon as each teacher submits.</p>
+{{end}}
+{{end}}

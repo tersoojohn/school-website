@@ -1,0 +1,25 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner"><div>
+  <h1>Setup link ready</h1>
+  <p class="sub">{{.Data.Name}} chooses their own password from this link. Nobody else ever sees or knows it.</p>
+</div>
+<div class="pagehead-actions"><button class="btn" type="button" data-print>Print slip</button></div>
+</div></div>
+<div class="container page">
+  <div class="slip">
+    <dl>
+      <dt>Name</dt><dd>{{.Data.Name}}</dd>
+      <dt>Role</dt><dd>{{.Data.Role}}</dd>
+      <dt>Username</dt><dd>{{.Data.Username}}</dd>
+      <dt>Link valid until</dt><dd>{{datetime .Data.Expires}}</dd>
+    </dl>
+    <p class="muted small">Open this link once, set a password, and the link stops working.</p>
+    <code class="link" id="setup-link">{{.Data.Link}}</code>
+  </div>
+  <div class="btn-row spaced">
+    <button class="btn btn-primary" type="button" data-copy="#setup-link">Copy link</button>
+    <a class="btn" href="{{.Data.BackPath}}">{{.Data.BackLabel}}</a>
+  </div>
+  <p class="hint spaced">Share it in person, on the printed slip, or by a message to the person. This page shows the link once; you can always create a new one from their account.</p>
+</div>
+{{end}}

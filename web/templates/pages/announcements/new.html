@@ -1,0 +1,35 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner"><div>
+  <p class="crumb"><a href="/announcements">Announcements</a></p>
+  <h1>New announcement</h1>
+  <p class="sub">Students in a class and the teacher of a subject see subject announcements. Students and support staff cannot post.</p>
+</div></div></div>
+<div class="container page">
+  <form method="post" action="/announcements" class="form form-wide">
+    <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+    {{with .Data.Error}}<p class="alert alert-error" role="alert">{{.}}</p>{{end}}
+    <label class="field"><span>Title</span><input name="title" value="{{.Data.Title}}" maxlength="120" required autofocus></label>
+    <label class="field"><span>Message</span><textarea name="body" rows="7" maxlength="4000" required>{{.Data.Body}}</textarea></label>
+
+    {{if .Data.CanBroadcast}}
+    <fieldset>
+      <legend>Who should see it</legend>
+      <label class="choice"><input type="radio" name="scope" value="school"{{if eq .Data.Scope "school"}} checked{{end}}><span>Everyone: students and all staff</span></label>
+      <label class="choice"><input type="radio" name="scope" value="staff"{{if eq .Data.Scope "staff"}} checked{{end}}><span>All staff only</span></label>
+      <label class="choice"><input type="radio" name="scope" value="subject"{{if eq .Data.Scope "subject"}} checked{{end}}><span>One subject in one class (choose below)</span></label>
+    </fieldset>
+    {{else}}
+    <input type="hidden" name="scope" value="subject">
+    {{end}}
+
+    <label class="field"><span>Subject and class{{if .Data.CanBroadcast}} (only for the last option){{end}}</span>
+      <select name="class_subject_id"{{if not .Data.CanBroadcast}} required{{end}}>
+        <option value="">Choose a subject</option>
+        {{range .Data.Subjects}}<option value="{{.ID}}"{{if eq .ID $.Data.SubjectID}} selected{{end}}>{{.SubjectName}}, {{.ClassName}}</option>{{end}}
+      </select>
+      {{if and (not .Data.CanBroadcast) (not .Data.Subjects)}}<span class="hint">You have no assigned subjects yet, so there is nobody to address.</span>{{end}}
+    </label>
+    <div><button class="btn btn-primary">Post announcement</button></div>
+  </form>
+</div>
+{{end}}

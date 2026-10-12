@@ -1,0 +1,15 @@
+{{define "announcement_list"}}
+{{if .}}
+<ul class="notices">
+  {{range .}}
+  <li class="notice">
+    <h3>{{.Title}}</h3>
+    <p class="notice-meta"><span>{{.AuthorName}}, {{.AuthorRole.Label}}</span><span class="chip chip-outline">{{.Audience}}</span><span>{{datetime .CreatedAt}}</span></p>
+    {{range paragraphs .Body}}<p>{{.}}</p>{{end}}
+  </li>
+  {{end}}
+</ul>
+{{else}}
+<p class="empty">Nothing has been announced to you yet.</p>
+{{end}}
+{{end}}

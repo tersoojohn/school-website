@@ -1,0 +1,22 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner"><div>
+  <h1>Bank details</h1>
+  <p class="sub">Used by the school to pay you. Only you, the principal and the administrators can see them.</p>
+</div></div></div>
+<div class="container page">
+  {{if .Data.Bank}}
+  <p>Saved: account ending <strong>{{.Data.Bank.Last4}}</strong> at {{.Data.Bank.BankName}}, updated {{date .Data.Bank.UpdatedAt}}. Enter the full account number again to change anything.</p>
+  {{end}}
+  <form method="post" action="/teacher/bank" class="form form-wide">
+    <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+    {{with .Data.Error}}<p class="alert alert-error" role="alert">{{.}}</p>{{end}}
+    <label class="field"><span>Bank name</span><input name="bank_name" value="{{index .Data.Form "bank_name"}}" maxlength="60" required></label>
+    <label class="field"><span>Account name</span><input name="account_name" value="{{index .Data.Form "account_name"}}" maxlength="100" required></label>
+    <label class="field"><span>Account number</span>
+      <input name="account_number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" autocomplete="off" required>
+      <span class="hint">10 digits. It is stored encrypted.</span>
+    </label>
+    <div><button class="btn btn-primary">Save bank details</button></div>
+  </form>
+</div>
+{{end}}

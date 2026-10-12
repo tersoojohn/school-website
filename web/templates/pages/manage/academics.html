@@ -1,0 +1,71 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner"><div>
+  <h1>Academics</h1>
+  <p class="sub">Terms, classes, subjects and who teaches what.</p>
+</div></div></div>
+<div class="container page">
+  <div class="pair">
+    <section class="block">
+      <div class="block-head"><h2>Terms</h2><p>Teachers record scores for the current term</p></div>
+      {{if .Data.Terms}}
+      <table class="table"><tbody>
+        {{range .Data.Terms}}
+        <tr><td>{{.Name}}</td><td>{{if .IsCurrent}}<span class="chip chip-ok">Current</span>{{end}}</td>
+          <td class="end">{{if not .IsCurrent}}<form method="post" action="/manage/academics/terms/{{.ID}}/current" data-confirm="Make this the current term? Teachers will record scores for it from now on."><input type="hidden" name="csrf_token" value="{{$.CSRF}}"><button class="btn btn-sm">Make current</button></form>{{end}}</td></tr>
+        {{end}}
+      </tbody></table>
+      {{else}}<p class="empty">No terms yet.</p>{{end}}
+      <form method="post" action="/manage/academics/terms" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+        <label class="field"><span>New term</span><input name="name" placeholder="2026/2027 First Term" maxlength="60" required></label>
+        <button class="btn">Add term</button>
+      </form>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><h2>Classes</h2><p>{{plural (len .Data.Classes) "class" "classes"}}</p></div>
+      {{if .Data.Classes}}<ul class="tags">{{range .Data.Classes}}<li>{{.Name}}</li>{{end}}</ul>{{else}}<p class="empty">No classes yet.</p>{{end}}
+      <form method="post" action="/manage/academics/classes" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+        <label class="field"><span>New class</span><input name="name" placeholder="JSS 1A" maxlength="40" required></label>
+        <button class="btn">Add class</button>
+      </form>
+    </section>
+  </div>
+
+  <section class="block">
+    <div class="block-head"><h2>Subjects</h2><p>{{plural (len .Data.Subjects) "subject" "subjects"}}</p></div>
+    {{if .Data.Subjects}}<ul class="tags">{{range .Data.Subjects}}<li>{{.Name}} <span class="muted">{{.Code}}</span></li>{{end}}</ul>{{else}}<p class="empty">No subjects yet.</p>{{end}}
+    <form method="post" action="/manage/academics/subjects" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+      <label class="field"><span>Subject</span><input name="name" placeholder="Mathematics" maxlength="60" required></label>
+      <label class="field"><span>Short code</span><input name="code" placeholder="MTH" maxlength="12" required></label>
+      <button class="btn">Add subject</button>
+    </form>
+  </section>
+
+  <div class="block split">
+    <section>
+      <div class="block-head"><h2>Who teaches what</h2><p>{{plural (len .Data.Assignments) "assignment" "assignments"}}</p></div>
+      {{if .Data.Assignments}}
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th data-sort="text">Class</th><th data-sort="text">Subject</th><th data-sort="text">Teacher</th></tr></thead>
+        <tbody>{{range .Data.Assignments}}<tr><td>{{.ClassName}}</td><td>{{.SubjectName}}</td><td>{{if .TeacherName}}{{.TeacherName}}{{else}}<span class="chip chip-warn">Not assigned</span>{{end}}</td></tr>
+        {{end}}</tbody>
+      </table></div>
+      {{else}}<p class="empty">No subjects have been given to a class yet.</p>{{end}}
+    </section>
+    <section>
+      <div class="block-head"><h2>Assign a teacher</h2></div>
+      <form method="post" action="/manage/academics/assignments" class="form">
+        <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+        <p class="hint">Choosing a class and subject that already exist changes the teacher.</p>
+        <label class="field"><span>Class</span><select name="class_id" required><option value="">Choose a class</option>{{range .Data.Classes}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select></label>
+        <label class="field"><span>Subject</span><select name="subject_id" required><option value="">Choose a subject</option>{{range .Data.Subjects}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select></label>
+        <label class="field"><span>Teacher</span><select name="teacher_id"><option value="0">No teacher yet</option>{{range .Data.Teachers}}<option value="{{.ID}}">{{.FullName}}</option>{{end}}</select></label>
+        <div><button class="btn btn-primary">Save assignment</button></div>
+      </form>
+    </section>
+  </div>
+</div>
+{{end}}

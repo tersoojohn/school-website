@@ -1,0 +1,35 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner"><div>
+  <p class="crumb"><a href="/manage/students">Students</a></p>
+  <h1>Register a student</h1>
+  <p class="sub">After registering you get a one-time link for the student or their guardian to set a password.</p>
+</div></div></div>
+<div class="container page">
+{{if not .Data.Classes}}
+  <p class="empty">There are no classes yet. <a href="/manage/academics">Add a class</a> first, then come back.</p>
+{{else}}
+  <form method="post" action="/manage/students" class="form form-wide">
+    <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+    {{with .Data.Error}}<p class="alert alert-error" role="alert">{{.}}</p>{{end}}
+    <label class="field"><span>Full name</span><input name="full_name" value="{{index .Data.Form "full_name"}}" maxlength="100" required autofocus></label>
+    <label class="field"><span>Class</span>
+      <select name="class_id" required>
+        <option value="">Choose a class</option>
+        {{range .Data.Classes}}<option value="{{.ID}}"{{if eq .ID $.Data.ClassID}} selected{{end}}>{{.Name}}</option>{{end}}
+      </select>
+    </label>
+    <label class="field"><span>Date of birth (optional)</span><input type="date" name="date_of_birth" value="{{index .Data.Form "date_of_birth"}}"></label>
+    <label class="field"><span>Gender (optional)</span>
+      <select name="gender">
+        <option value="">Not stated</option>
+        <option value="Female"{{if eq (index .Data.Form "gender") "Female"}} selected{{end}}>Female</option>
+        <option value="Male"{{if eq (index .Data.Form "gender") "Male"}} selected{{end}}>Male</option>
+      </select>
+    </label>
+    <label class="field"><span>Guardian's name (optional)</span><input name="guardian_name" value="{{index .Data.Form "guardian_name"}}" maxlength="100"></label>
+    <label class="field"><span>Guardian's phone (optional)</span><input name="guardian_phone" value="{{index .Data.Form "guardian_phone"}}" inputmode="tel" maxlength="20"></label>
+    <div><button class="btn btn-primary">Register student</button></div>
+  </form>
+{{end}}
+</div>
+{{end}}

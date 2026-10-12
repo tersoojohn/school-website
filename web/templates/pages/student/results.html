@@ -1,0 +1,31 @@
+{{define "scripts"}}<script src="/static/js/student.js" defer></script>{{end}}
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner"><div>
+  <h1>Past terms</h1>
+  <p class="sub">Every term your teachers have published results for.</p>
+</div></div></div>
+<div class="container page">
+{{if .Data.Terms}}
+  <nav class="tabs" aria-label="Terms">
+    {{range .Data.Terms}}<a class="tab" href="/student/results?term={{.ID}}"{{if eq .ID $.Data.Selected.ID}} aria-current="page"{{end}}>{{.Name}}</a>{{end}}
+  </nav>
+  <div class="term-panel">
+    {{if gt (len .Data.Trend) 1}}
+    <section class="block">
+      <div class="block-head"><h2>Your average by term</h2></div>
+      <figure class="chart reveal">
+        <table class="chart-data" data-chart="line" data-min="0" data-max="100"><thead><tr><th scope="col">Term</th><th scope="col">Average</th></tr></thead>
+        <tbody>{{range .Data.Trend}}<tr><th scope="row">{{.Term}}</th><td data-v="{{.Mean}}">{{f1 .Mean}}</td></tr>{{end}}</tbody></table>
+      </figure>
+    </section>
+    {{end}}
+    <section class="block">
+      <div class="block-head"><h2>{{.Data.Selected.Name}}</h2>{{if .Data.Rows}}<p>Average {{f1 .Data.Report.Average}}, grade {{.Data.Report.Grade}}</p>{{end}}</div>
+      {{template "subject_ledger" .Data.Rows}}
+    </section>
+  </div>
+{{else}}
+  <p class="empty">No results have been published yet.</p>
+{{end}}
+</div>
+{{end}}

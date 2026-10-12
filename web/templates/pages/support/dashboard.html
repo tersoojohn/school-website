@@ -1,0 +1,29 @@
+{{define "content"}}
+<section class="hero">
+  <img class="hero-img" src="{{.Images.Staff}}" alt="" data-fallback decoding="async" referrerpolicy="no-referrer">
+  <div class="container hero-inner">
+    <div>
+      <p class="hero-hello"><span data-greeting>Hello</span>,</p>
+      <h1>{{.Data.Staff.FullName}}</h1>
+      <p class="hero-sub">{{.Data.Staff.JobTitle}}. Staff ID {{.Data.Staff.Username}}</p>
+    </div>
+  </div>
+</section>
+<div class="container page">
+  <div class="split">
+    <section class="block">
+      <div class="block-head"><h2>Announcements</h2><p><a href="/announcements">All announcements</a></p></div>
+      {{template "announcement_list" .Data.Announcements}}
+    </section>
+    <section class="block">
+      <div class="block-head"><h2>Your details</h2></div>
+      <dl class="facts">
+        <dt>Name</dt><dd>{{.Data.Staff.FullName}}</dd>
+        <dt>Staff ID</dt><dd>{{.Data.Staff.Username}}</dd>
+        <dt>Role</dt><dd>{{.Data.Staff.JobTitle}}</dd>
+        {{if .Data.Staff.Phone}}<dt>Phone</dt><dd>{{.Data.Staff.Phone}}</dd>{{end}}
+      </dl>
+    </section>
+  </div>
+</div>
+{{end}}

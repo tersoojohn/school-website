@@ -1,0 +1,36 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner"><div>
+  <h1>Results progress</h1>
+  <p class="sub">{{if .Data.Term}}{{.Data.Term.Name}}. A sheet is visible to students once the teacher submits it.{{else}}No term is current yet.{{end}}</p>
+</div></div></div>
+<div class="container page">
+{{if .Data.Term}}
+  {{if .Data.Sheets}}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th data-sort="text">Class</th><th data-sort="text">Subject</th><th data-sort="text">Teacher</th><th>Scored</th><th data-sort="text">Status</th><th></th></tr></thead>
+    <tbody>
+      {{range .Data.Sheets}}
+      <tr>
+        <td>{{.ClassName}}</td>
+        <td>{{.SubjectName}}</td>
+        <td>{{if .TeacherName}}{{.TeacherName}}{{else}}<span class="chip chip-warn">Not assigned</span>{{end}}</td>
+        <td><div class="meter"><div class="meter-track"><span data-w="{{if .Students}}{{pctof .Scored .Students}}{{else}}0{{end}}"></span></div><span class="meter-text">{{.Scored}} of {{.Students}}</span></div></td>
+        <td>{{if .IsSubmitted}}<span class="chip chip-ok">Submitted</span>{{else if eq .Status "In progress"}}<span class="chip chip-warn">In progress</span>{{else}}<span class="chip">Not started</span>{{end}}</td>
+        <td class="end">
+          {{if gt .Submitted 0}}
+          <form method="post" action="/principal/results/{{.ClassSubjectID}}/reopen" data-confirm="Return this sheet to the teacher? Students will stop seeing these results until it is submitted again.">
+            <input type="hidden" name="csrf_token" value="{{$.CSRF}}">
+            <button class="btn btn-sm btn-danger">Return to teacher</button>
+          </form>
+          {{end}}
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table></div>
+  {{else}}<p class="empty">No subjects have been assigned to classes yet.</p>{{end}}
+{{else}}
+  <p class="empty">Add a term under <a href="/manage/academics">Academics</a> and mark it current.</p>
+{{end}}
+</div>
+{{end}}

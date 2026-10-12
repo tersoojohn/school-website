@@ -1,0 +1,50 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner">
+  <div><h1>Overview</h1><p class="sub">Registrations and enrolment at a glance.</p></div>
+  <div class="pagehead-actions">
+    <a class="btn btn-primary" href="/manage/students/new">Register a student</a>
+    <a class="btn" href="/manage/staff/new">Register a staff member</a>
+  </div>
+</div></div>
+
+<div class="container page">
+  <section class="block" aria-label="People">
+    <div class="figures">
+      <div class="figure"><p class="fig-n">{{.Data.Counts.Students}}</p><p class="fig-l">Students on roll</p></div>
+      <div class="figure"><p class="fig-n">{{.Data.Counts.Teachers}}</p><p class="fig-l">Teachers</p></div>
+      <div class="figure"><p class="fig-n">{{.Data.Counts.Support}}</p><p class="fig-l">Support staff</p></div>
+      <div class="figure"><p class="fig-n">{{len .Data.Pending}}</p><p class="fig-l">Waiting to set a password</p></div>
+    </div>
+  </section>
+
+  <div class="block pair">
+    <section>
+      <div class="block-head"><h2>Students per class</h2></div>
+      {{if .Data.Enrollment}}<figure class="chart">{{template "chart_bars" .Data.Enrollment}}</figure>{{else}}<p class="empty">No classes yet. <a href="/manage/academics">Add one</a>.</p>{{end}}
+    </section>
+    <section>
+      <div class="block-head"><h2>New registrations</h2><p>Last six months</p></div>
+      <figure class="chart">{{template "chart_columns" .Data.Registrations}}</figure>
+    </section>
+  </div>
+
+  <div class="block pair">
+    <section>
+      <div class="block-head"><h2>Waiting to set a password</h2></div>
+      {{if .Data.Pending}}
+      <p class="muted">Open the account to issue a fresh setup link if theirs has expired.</p>
+      <div class="table-wrap"><table class="table">
+        <tbody>
+          {{range .Data.Pending}}<tr><td><a href="/manage/people/{{.ID}}">{{.FullName}}</a><span class="sub">{{.Role.Label}}, registered {{date .CreatedAt}}</span></td></tr>
+          {{end}}
+        </tbody>
+      </table></div>
+      {{else}}<p class="empty">Everyone has set their password.</p>{{end}}
+    </section>
+    <section>
+      <div class="block-head"><h2>Latest announcements</h2><p><a href="/announcements">All announcements</a></p></div>
+      {{template "announcement_list" .Data.Announcements}}
+    </section>
+  </div>
+</div>
+{{end}}

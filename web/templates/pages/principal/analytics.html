@@ -1,0 +1,92 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner">
+  <div>
+    <h1>Analytics</h1>
+    <p class="sub">{{if .Data.Term}}Submitted results for {{.Data.Term.Name}}{{else}}No terms yet{{end}}</p>
+  </div>
+  {{if .Data.Terms}}
+  <form method="get" action="/principal/analytics" class="inline-form flush">
+    <label class="field"><span>Term</span>
+      <select name="term">
+        {{range .Data.Terms}}<option value="{{.ID}}"{{if $.Data.Term}}{{if eq .ID $.Data.Term.ID}} selected{{end}}{{end}}>{{.Name}}{{if .IsCurrent}} (current){{end}}</option>{{end}}
+      </select>
+    </label>
+    <button class="btn">Show</button>
+  </form>
+  {{end}}
+</div></div>
+
+<div class="container page">
+{{if not .Data.Summary.Count}}
+  <p class="empty">No results have been submitted for this term yet. Analytics appear as soon as teachers submit their score sheets.</p>
+  {{if .Data.Enrollment}}
+  <section class="block"><div class="block-head"><h2>Students per class</h2></div><figure class="chart">{{template "chart_bars" .Data.Enrollment}}</figure></section>
+  {{end}}
+{{else}}
+  <section class="block" aria-label="Summary">
+    <div class="figures">
+      <div class="figure"><p class="fig-n">{{f1 .Data.Summary.Mean}}</p><p class="fig-l">School average</p><p class="fig-note">Median {{f1 .Data.Summary.Median}}</p></div>
+      <div class="figure"><p class="fig-n">{{f1 .Data.Summary.PassRate}}%</p><p class="fig-l">Pass rate</p><p class="fig-note">Total of {{f1 .Data.PassMark}} or more</p></div>
+      <div class="figure"><p class="fig-n">{{.Data.Summary.Count}}</p><p class="fig-l">Results recorded</p></div>
+      <div class="figure"><p class="fig-n">{{f1 .Data.Summary.Max}}</p><p class="fig-l">Highest total</p><p class="fig-note">Lowest {{f1 .Data.Summary.Min}}</p></div>
+    </div>
+  </section>
+
+  {{if .Data.Insights}}
+  <section class="block">
+    <div class="block-head"><h2>What stands out</h2></div>
+    <ul class="highlights">{{range .Data.Insights}}<li>{{.}}</li>{{end}}</ul>
+  </section>
+  {{end}}
+
+  <div class="block pair">
+    <section>
+      <div class="block-head"><h2>Grade distribution</h2><p>All subjects</p></div>
+      <figure class="chart">{{template "chart_grades" .Data.Distribution}}</figure>
+    </section>
+    <section>
+      <div class="block-head"><h2>Class averages</h2><p>Out of 100</p></div>
+      {{if .Data.Classes}}
+      <figure class="chart">
+        <table class="chart-data" data-chart="bars" data-max="100"><thead><tr><th scope="col">Class</th><th scope="col">Average</th></tr></thead>
+        <tbody>{{range .Data.Classes}}<tr><th scope="row">{{.Class}}</th><td data-v="{{.Mean}}">{{f1 .Mean}}</td></tr>{{end}}</tbody></table>
+      </figure>
+      {{end}}
+    </section>
+  </div>
+
+  <section class="block">
+    <div class="block-head"><h2>Subjects</h2><p>Ranked by average. Click a heading to sort.</p></div>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th data-sort="text">Subject</th><th class="num" data-sort="num">Results</th><th class="num" data-sort="num">Average</th><th class="num" data-sort="num">Pass rate</th><th>Level</th></tr></thead>
+      <tbody>
+        {{range .Data.Subjects}}
+        <tr>
+          <td>{{.Subject}}</td><td class="num">{{.Results}}</td>
+          <td class="num" data-v="{{.Mean}}">{{f1 .Mean}}</td>
+          <td class="num" data-v="{{.PassRate}}">{{f1 .PassRate}}%</td>
+          <td><div class="meter"><div class="meter-track"><span data-w="{{.Mean}}"></span></div></div></td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table></div>
+  </section>
+
+  <div class="block pair">
+    <section>
+      <div class="block-head"><h2>Average by term</h2></div>
+      {{if .Data.Trend}}
+      <figure class="chart">
+        <table class="chart-data" data-chart="line" data-min="0" data-max="100"><thead><tr><th scope="col">Term</th><th scope="col">Average</th></tr></thead>
+        <tbody>{{range .Data.Trend}}<tr><th scope="row">{{.Term}}</th><td data-v="{{.Mean}}">{{f1 .Mean}}</td></tr>{{end}}</tbody></table>
+      </figure>
+      {{end}}
+    </section>
+    <section>
+      <div class="block-head"><h2>Students per class</h2></div>
+      <figure class="chart">{{template "chart_bars" .Data.Enrollment}}</figure>
+    </section>
+  </div>
+{{end}}
+</div>
+{{end}}

@@ -1,0 +1,30 @@
+{{define "content"}}
+<div class="auth">
+  <section class="auth-visual">
+    <img src="{{.Images.Login}}" alt="" data-fallback decoding="async" referrerpolicy="no-referrer">
+    <p class="auth-school">{{.SchoolName}}</p>
+    <div class="auth-statement">
+      <h1>Every result, in one place.</h1>
+      <p>Classes, scores and announcements for students, teachers and the school office.</p>
+    </div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-box">
+      <h2>Sign in</h2>
+      <p class="lede">Use the username you were given when your account was created.</p>
+      <form method="post" action="/login" class="form">
+        <input type="hidden" name="csrf_token" value="{{.Data.Token}}">
+        {{with .Data.Error}}<p class="alert alert-error" role="alert">{{.}}</p>{{end}}
+        <label class="field"><span>Username</span>
+          <input name="username" value="{{.Data.Username}}" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="64" required autofocus>
+        </label>
+        <label class="field"><span>Password</span>
+          <input type="password" name="password" autocomplete="current-password" maxlength="256" required>
+        </label>
+        <button class="btn btn-primary">Sign in</button>
+      </form>
+      <p class="auth-help">Forgot your password, or your account is new? Ask the school office for a setup link.</p>
+    </div>
+  </section>
+</div>
+{{end}}

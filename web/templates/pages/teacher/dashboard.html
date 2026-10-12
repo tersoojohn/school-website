@@ -1,0 +1,53 @@
+{{define "content"}}
+<section class="hero">
+  <img class="hero-img" src="{{.Images.Staff}}" alt="" data-fallback decoding="async" referrerpolicy="no-referrer">
+  <div class="container hero-inner">
+    <div>
+      <p class="hero-hello"><span data-greeting>Hello</span>,</p>
+      <h1>{{.User.FullName}}</h1>
+      <p class="hero-sub">{{if .Data.Term}}{{.Data.Term.Name}}{{else}}No term is current yet{{end}}</p>
+    </div>
+    <div class="figures" role="group" aria-label="Your students">
+      <div class="figure"><p class="fig-n">{{.Data.TotalStudents}}</p><p class="fig-l">Students you teach</p></div>
+      <div class="figure"><p class="fig-n">{{.Data.Classes}}</p><p class="fig-l">{{if eq .Data.Classes 1}}Class{{else}}Classes{{end}}</p></div>
+      <div class="figure"><p class="fig-n">{{len .Data.Sheets}}</p><p class="fig-l">{{if eq (len .Data.Sheets) 1}}Subject{{else}}Subjects{{end}}</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="container page">
+  <section class="block">
+    <div class="block-head"><h2>My classes</h2>
+      <p class="btn-row"><a class="btn btn-primary btn-sm" href="/teacher/students">All {{.Data.TotalStudents}} of my students</a></p>
+    </div>
+    {{if .Data.Term}}
+      {{if .Data.Sheets}}
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th data-sort="text">Subject</th><th data-sort="text">Class</th><th class="num" data-sort="num">Students</th><th>Scores entered</th><th class="num" data-sort="num">Average</th><th class="num" data-sort="num">Pass rate</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {{range .Data.Sheets}}
+          <tr>
+            <td><a href="/teacher/scores/{{.ClassSubjectID}}">{{.SubjectName}}</a></td>
+            <td>{{.ClassName}}</td>
+            <td class="num">{{.Students}}</td>
+            <td><div class="meter"><div class="meter-track"><span data-w="{{if .Students}}{{pctof .Scored .Students}}{{else}}0{{end}}"></span></div><span class="meter-text">{{.Scored}} of {{.Students}}</span></div></td>
+            <td class="num" data-v="{{.Summary.Mean}}">{{if .Summary.Count}}{{f1 .Summary.Mean}}{{else}}-{{end}}</td>
+            <td class="num" data-v="{{.Summary.PassRate}}">{{if .Summary.Count}}{{f1 .Summary.PassRate}}%{{else}}-{{end}}</td>
+            <td>{{if .IsSubmitted}}<span class="chip chip-ok">Submitted</span>{{else if eq .Status "In progress"}}<span class="chip chip-warn">In progress</span>{{else}}<span class="chip">Not started</span>{{end}}</td>
+            <td class="end"><a class="btn btn-sm{{if not .IsSubmitted}} btn-primary{{end}}" href="/teacher/scores/{{.ClassSubjectID}}">{{if .IsSubmitted}}View roster{{else}}Open roster{{end}}</a></td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table></div>
+      {{else}}<p class="empty">You have not been assigned any subjects yet. The school office does this under Academics.</p>{{end}}
+    {{else}}
+      <p class="empty">No term is active yet. You can record scores once the principal or administration sets the current term.</p>
+    {{end}}
+  </section>
+
+  <section class="block">
+    <div class="block-head"><h2>Announcements for you</h2><p><a href="/announcements/new">Write an announcement</a></p></div>
+    {{template "announcement_list" .Data.Announcements}}
+  </section>
+</div>
+{{end}}

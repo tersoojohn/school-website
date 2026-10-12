@@ -1,0 +1,98 @@
+{{define "scripts"}}<script src="/static/js/sheet.js" defer></script>{{end}}
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner">
+  <div>
+    <p class="crumb"><a href="/teacher">My classes</a></p>
+    <h1>{{.Data.CS.SubjectName}}, {{.Data.CS.ClassName}}</h1>
+    <p class="sub">{{.Data.Term.Name}}. {{plural (len .Data.Rows) "student" "students"}} assigned to you. Continuous assessment is out of {{num .Data.MaxCA}}, the exam out of {{num .Data.MaxExam}}.</p>
+  </div>
+  <div class="pagehead-actions">
+    <a class="btn" href="/announcements/new?subject={{.Data.CS.ID}}">Announce to this class</a>
+    <a class="btn" href="/teacher/scores/{{.Data.CS.ID}}/export.csv">Download as spreadsheet</a>
+  </div>
+</div></div>
+
+<div class="container page">
+{{if .Data.Errors}}
+  <div class="alert alert-error" role="alert"><p><strong>Nothing was saved.</strong> Fix these and try again:</p><ul>{{range .Data.Errors}}<li>{{.}}</li>{{end}}</ul></div>
+{{end}}
+
+{{if .Data.Rows}}
+<form method="post" action="/teacher/scores/{{.Data.CS.ID}}" data-sheet data-max-ca="{{num .Data.MaxCA}}" data-max-exam="{{num .Data.MaxExam}}" data-pass="40">
+  <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+
+  <section class="block" aria-label="Class statistics">
+    <div class="split">
+      <div class="figures">
+        <div class="figure"><p class="fig-n">{{len .Data.Rows}}</p><p class="fig-l">Students</p><p class="fig-note"><span data-stat="scored">{{.Data.Summary.Count}} of {{len .Data.Rows}}</span> scored</p></div>
+        <div class="figure"><p class="fig-n" data-stat="mean">{{if .Data.Summary.Count}}{{f1 .Data.Summary.Mean}}{{else}}-{{end}}</p><p class="fig-l">Average</p><p class="fig-note">Median <span data-stat="median">{{if .Data.Summary.Count}}{{f1 .Data.Summary.Median}}{{else}}-{{end}}</span></p></div>
+        <div class="figure"><p class="fig-n"><span data-stat="pass">{{if .Data.Summary.Count}}{{f1 .Data.Summary.PassRate}}%{{else}}-{{end}}</span></p><p class="fig-l">Pass rate</p><p class="fig-note">High <span data-stat="max">{{if .Data.Summary.Count}}{{f1 .Data.Summary.Max}}{{else}}-{{end}}</span>, low <span data-stat="min">{{if .Data.Summary.Count}}{{f1 .Data.Summary.Min}}{{else}}-{{end}}</span></p></div>
+      </div>
+      <figure class="chart">
+        <figcaption>Grades, updating as you type</figcaption>
+        {{template "chart_grades" .Data.Distribution}}
+      </figure>
+    </div>
+  </section>
+
+  {{if not .Data.AllLocked}}
+  <section class="block">
+    <fieldset class="bulk">
+      <legend>Change many scores at once</legend>
+      <div class="bulk-row">
+        <button type="button" class="btn btn-sm" data-select-everyone>Select everyone</button>
+        <span class="muted" data-selected>No students selected</span>
+      </div>
+      <div class="bulk-row">
+        <label class="field"><span>Score</span><select data-bulk-field><option value="ca">Continuous assessment</option><option value="exam">Exam</option></select></label>
+        <label class="field"><span>Change</span><select data-bulk-op><option value="add">Add marks</option><option value="sub">Subtract marks</option><option value="set">Set to</option><option value="clear">Clear</option></select></label>
+        <label class="field"><span>Marks</span><input type="text" data-bulk-value inputmode="decimal" autocomplete="off"></label>
+        <button type="button" class="btn btn-primary" data-bulk-apply disabled>Apply to selected</button>
+        <button type="button" class="btn" data-bulk-undo>Undo last change</button>
+      </div>
+      <p class="bulk-msg" data-bulk-msg role="status" aria-live="polite"></p>
+    </fieldset>
+  </section>
+  {{end}}
+
+  <section class="block">
+    <div class="toolbar">
+      <div class="search"><label class="sr-only" for="q">Find a student</label><input id="q" type="search" placeholder="Find a student" data-filter="#sheet-table" autocomplete="off"></div>
+      <p class="count" data-filter-count></p>
+    </div>
+    <div class="table-wrap"><table class="table scores" id="sheet-table">
+      <thead><tr>
+        <th class="check">{{if not .Data.AllLocked}}<input type="checkbox" data-select-all aria-label="Select everyone shown">{{end}}</th>
+        <th>Student</th><th class="num">CA (0 to {{num .Data.MaxCA}})</th><th class="num">Exam (0 to {{num .Data.MaxExam}})</th><th class="num">Total</th><th class="gr">Grade</th>
+      </tr></thead>
+      <tbody>
+        {{range .Data.Rows}}
+        <tr data-row>
+          <td class="check"><input type="checkbox" data-select aria-label="Select {{.Name}}"{{if .Locked}} disabled{{end}}></td>
+          <td>{{.Name}}<span class="sub">{{.Username}}{{if .Locked}}. Submitted{{end}}</span></td>
+          <td class="num"><input class="score" name="ca_{{.StudentID}}" data-field="ca" value="{{.CA}}" inputmode="decimal" autocomplete="off" aria-label="Continuous assessment for {{.Name}}"{{if .Locked}} disabled{{end}}></td>
+          <td class="num"><input class="score" name="exam_{{.StudentID}}" data-field="exam" value="{{.Exam}}" inputmode="decimal" autocomplete="off" aria-label="Exam score for {{.Name}}"{{if .Locked}} disabled{{end}}></td>
+          <td class="num tot" data-total>{{.Total}}</td>
+          <td class="gr" data-grade{{if .Grade}} data-g="{{.Grade}}"{{end}}>{{.Grade}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table></div>
+
+    {{if .Data.AllLocked}}
+      <p class="hint spaced">This sheet is submitted and locked. If a score must change, ask the principal to return it to you.</p>
+    {{else}}
+      <div class="actionbar">
+        <p class="dirty" data-dirty>All changes are saved.</p>
+        <button class="btn" name="action" value="save">Save draft</button>
+        <button class="btn btn-primary" name="action" value="submit" data-confirm="Submit these scores? This locks the sheet and publishes every result to students.">Submit scores</button>
+      </div>
+      <p class="hint">Saving keeps a private draft. Submitting locks the sheet and publishes results to students. Every student needs both scores first.</p>
+    {{end}}
+  </section>
+</form>
+{{else}}
+<p class="empty">There are no active students in this class yet.</p>
+{{end}}
+</div>
+{{end}}

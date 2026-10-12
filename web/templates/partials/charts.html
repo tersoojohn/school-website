@@ -1,0 +1,5 @@
+{{define "chart_bars"}}<table class="chart-data" data-chart="bars"><thead><tr><th scope="col">Name</th><th scope="col">Value</th></tr></thead><tbody>{{range .}}<tr><th scope="row">{{.Label}}</th><td>{{.Value}}</td></tr>{{end}}</tbody></table>{{end}}
+
+{{define "chart_grades"}}<table class="chart-data" data-chart="columns" data-bad="F" id="grade-chart"><thead><tr><th scope="col">Grade</th><th scope="col">Results</th></tr></thead><tbody>{{range .}}<tr><th scope="row">{{.Label}}</th><td>{{.Value}}</td></tr>{{end}}</tbody></table>{{end}}
+
+{{define "chart_columns"}}<table class="chart-data" data-chart="columns"><thead><tr><th scope="col">Name</th><th scope="col">Value</th></tr></thead><tbody>{{range .}}<tr><th scope="row">{{.Label}}</th><td>{{.Value}}</td></tr>{{end}}</tbody></table>{{end}}

@@ -1,0 +1,22 @@
+{{define "content"}}
+<div class="pagehead"><div class="container pagehead-inner"><div>
+  <p class="crumb"><a href="/manage/staff">Staff</a></p>
+  <h1>Register a staff member</h1>
+  <p class="sub">They set their own password from a one-time link.</p>
+</div></div></div>
+<div class="container page">
+  <form method="post" action="/manage/staff" class="form form-wide">
+    <input type="hidden" name="csrf_token" value="{{.CSRF}}">
+    {{with .Data.Error}}<p class="alert alert-error" role="alert">{{.}}</p>{{end}}
+    <label class="field"><span>Full name</span><input name="full_name" value="{{index .Data.Form "full_name"}}" maxlength="100" required autofocus></label>
+    <fieldset>
+      <legend>Type of staff</legend>
+      <label class="choice"><input type="radio" name="kind" value="educating"{{if eq (index .Data.Form "kind") "educating"}} checked{{end}}><span>Educating: teaches, scores exams and records results</span></label>
+      <label class="choice"><input type="radio" name="kind" value="non_educating"{{if eq (index .Data.Form "kind") "non_educating"}} checked{{end}}><span>Non-educating: cleaner, security, kitchen and other support roles</span></label>
+    </fieldset>
+    <label class="field"><span>Job title</span><input name="job_title" value="{{index .Data.Form "job_title"}}" maxlength="60"><span class="hint">Required for non-educating staff, for example Cleaner or Security.</span></label>
+    <label class="field"><span>Phone (optional)</span><input name="phone" value="{{index .Data.Form "phone"}}" inputmode="tel" maxlength="20"></label>
+    <div><button class="btn btn-primary">Register staff member</button></div>
+  </form>
+</div>
+{{end}}

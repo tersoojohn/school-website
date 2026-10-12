@@ -1,0 +1,40 @@
+{{define "scripts"}}<script src="/static/js/student.js" defer></script>{{end}}
+{{define "content"}}
+<section class="hero hero-student" data-enter>
+  <img class="hero-img" src="{{.Images.Student}}" alt="" data-fallback decoding="async" referrerpolicy="no-referrer">
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <p class="hero-hello rise" data-d="0"><span data-greeting>Hello</span>,</p>
+      <h1 class="rise" data-d="1">{{.Data.Student.FullName}}</h1>
+      <p class="hero-sub rise" data-d="2">{{.Data.Student.ClassName}}. Student ID {{.Data.Student.Username}}</p>
+      {{if .Data.Term}}<p class="hero-term rise" data-d="3">{{.Data.Term.Name}}</p>{{end}}
+    </div>
+    {{if .Data.Rows}}
+    <div class="ring rise" data-d="2" data-ring="{{num .Data.Report.Average}}">
+      <div class="ring-dial">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-track" cx="60" cy="60" r="52"/><circle class="ring-fill" cx="60" cy="60" r="52"/></svg>
+        <div class="ring-center"><span class="ring-num" data-count="{{f1 .Data.Report.Average}}">{{f1 .Data.Report.Average}}</span><span class="ring-cap">average</span></div>
+      </div>
+      <p class="ring-grade">Grade {{.Data.Report.Grade}}, {{.Data.Report.Remark}}</p>
+    </div>
+    {{end}}
+  </div>
+</section>
+
+<div class="container page">
+  <section class="block">
+    <div class="block-head"><h2>Your results</h2>{{if .Data.Rows}}<p>{{plural (len .Data.Rows) "subject" "subjects"}} published</p>{{end}}</div>
+    {{if .Data.Term}}
+      {{template "subject_ledger" .Data.Rows}}
+      {{if .Data.Highlights}}<ul class="highlights reveal">{{range .Data.Highlights}}<li>{{.}}</li>{{end}}</ul>{{end}}
+    {{else}}
+      <p class="empty">No term is active yet.</p>
+    {{end}}
+  </section>
+
+  <section class="block">
+    <div class="block-head"><h2>Announcements</h2><p><a href="/announcements">All announcements</a></p></div>
+    <div class="reveal">{{template "announcement_list" .Data.Announcements}}</div>
+  </section>
+</div>
+{{end}}

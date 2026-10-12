@@ -1,0 +1,35 @@
+{{define "content"}}
+<div class="auth">
+  <section class="auth-visual">
+    <img src="{{.Images.Login}}" alt="" data-fallback decoding="async" referrerpolicy="no-referrer">
+    <p class="auth-school">{{.SchoolName}}</p>
+    <div class="auth-statement">
+      <h1>Welcome.</h1>
+      <p>Choose a password only you know. The school office never sees it.</p>
+    </div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-box">
+      {{if .Data.Invalid}}
+        <h2>This link no longer works</h2>
+        <p class="lede">Setup links can be used once and expire after 72 hours. Ask the school office for a new one.</p>
+        <a class="btn" href="/login">Go to sign in</a>
+      {{else}}
+        <h2>Set your password</h2>
+        <div class="auth-who"><strong>{{.Data.Name}}</strong><span class="muted">{{.Data.Role}}. Username {{.Data.Username}}</span></div>
+        <form method="post" action="" class="form">
+          {{with .Data.Error}}<p class="alert alert-error" role="alert">{{.}}</p>{{end}}
+          <label class="field"><span>New password</span>
+            <input type="password" name="new" autocomplete="new-password" minlength="10" maxlength="128" required autofocus>
+            <span class="hint">At least 10 characters, with a letter and a number.</span>
+          </label>
+          <label class="field"><span>Repeat new password</span>
+            <input type="password" name="confirm" autocomplete="new-password" minlength="10" maxlength="128" required>
+          </label>
+          <button class="btn btn-primary">Save password and sign in</button>
+        </form>
+      {{end}}
+    </div>
+  </section>
+</div>
+{{end}}
